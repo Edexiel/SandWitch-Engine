@@ -20,7 +20,11 @@ endif()
 
 add_subdirectory(vendor)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE enTT glm::glm SDL3 fmt jsoncpp imgui jolt glm)
+if (EMSCRIPTEN)
+    target_link_libraries(${PROJECT_NAME} PRIVATE enTT glm::glm SDL3 fmt jsoncpp imgui jolt glm)
+else ()
+    target_link_libraries(${PROJECT_NAME} PRIVATE enTT glm::glm SDL3 fmt jsoncpp imgui jolt glm glad)
+endif ()
 
 
 

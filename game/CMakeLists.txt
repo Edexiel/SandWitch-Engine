@@ -16,3 +16,14 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SandwitchEngine)
+
+if (EMSCRIPTEN)
+    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
+    target_link_options(${PROJECT_NAME} PRIVATE
+            -sWASM=1
+            -sUSE_WEBGL2=1
+            -sFULL_ES3=1
+            -sALLOW_MEMORY_GROWTH=1
+            -sASYNCIFY=1
+    )
+endif ()
