@@ -22,9 +22,6 @@ A C++17 game engine and editor built with SDL3, OpenGL, and a modular architectu
 ### Windows
 - [Visual Studio 2022](https://visualstudio.microsoft.com/) with the **Desktop development with C++** workload, or MinGW-w64
 
-### Web (Emscripten)
-- [Emscripten SDK](https://emscripten.org/docs/getting_started/downloads.html) ≥ 3.1
-
 ---
 
 ## Building
@@ -53,24 +50,6 @@ cmake --build cmake-build-release --config Release
 ```
 
 **Visual Studio:** open the repo folder with *File → Open → CMake…* and select the root `CMakeLists.txt`. Visual Studio will configure the project automatically.
-
-### Web (Emscripten)
-
-Make sure `emcmake` is on your `PATH` (run `emsdk_env.sh` / `emsdk_env.bat` first):
-
-```sh
-emcmake cmake -B cmake-build-web -DCMAKE_BUILD_TYPE=Release
-cmake --build cmake-build-web --target SandwitchGame
-```
-
-Output files (`SandwitchGame.html`, `.js`, `.wasm`) will be in `cmake-build-web/game/`. Serve them with any static HTTP server:
-
-```sh
-python3 -m http.server 8080 --directory cmake-build-web/game
-# then open http://localhost:8080/SandwitchGame.html
-```
-
-> **Note:** The editor target is not built for web.
 
 ---
 

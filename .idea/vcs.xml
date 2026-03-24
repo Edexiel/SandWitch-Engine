@@ -2,23 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/entt-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/fastgltf-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/fmt-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/glm-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/imgui-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/imguizmo-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/jolt-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/jsoncpp-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/sdl3-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/entt-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/fastgltf-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/fmt-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/glm-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/imgui-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/imguizmo-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/jolt-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/jsoncpp-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/sdl3-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug-gcc/_deps/fmt-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug-gcc/_deps/sdl3-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-release-gcc/_deps/fmt-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-release-gcc/_deps/sdl3-src" vcs="Git" />
   </component>
 </project>
