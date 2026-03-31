@@ -1,33 +1,39 @@
 #pragma once
+#include <chrono>
 #include <cstdint>
+#include <ostream>
+#include <string>
 
 class Timer
 {
 public:
-    // Initializes variables
     Timer();
 
-    // The various clock actions
     void start();
     void stop();
     void pause();
     void unpause();
 
-    // Gets the timer's time
-    uint32_t getTicks();
+    float getElapsedSeconds() const;
+    uint64_t getElapsedMilliseconds() const;
+    uint64_t getDeltaMilliseconds();
 
-    // Checks the status of the timer
-    bool isStarted();
-    bool isPaused();
+    bool hasElapsed(float seconds) const;
+    std::string toString() const;
+
+    bool isStarted() const;
+    bool isPaused() const;
+
+    friend std::ostream& operator<<(std::ostream& os, const Timer& timer);
 
 private:
-    // The clock time when the timer started
-    uint32_t mStartTicks;
+    using Clock = std::chrono::steady_clock;
+    using TimePoint = Clock::time_point;
 
-    // The ticks stored when the timer was paused
-    uint32_t mPausedTicks;
+    TimePoint mStartTime;
+    TimePoint mLastTickTime;
+    Clock::duration mPausedDuration;
 
-    // The timer status
     bool mPaused;
     bool mStarted;
 };

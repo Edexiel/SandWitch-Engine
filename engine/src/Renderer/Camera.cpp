@@ -4,7 +4,7 @@
 
 namespace Renderer
 {
-    Camera::Camera(float fov, float aspectRatio, float nearClip, float farClip)
+    Camera::Camera(float fov, float aspectRatio, float nearClip, float farClip) : near_clip_(nearClip)
     {
         _projection = glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip);
         RecalculateView();

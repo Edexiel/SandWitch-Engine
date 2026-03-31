@@ -2,10 +2,8 @@
 
 void Application::Tick()
 {
-    using Clock     = std::chrono::steady_clock;
-    auto  now       = Clock::now();
-    float deltaTime = std::chrono::duration<float>(now - _lastTime).count();
-    _lastTime       = now;
+    const float deltaTime = _timer.getElapsedSeconds();
+    _timer.start();
 
     OnUpdate(deltaTime);
     OnRender();
@@ -13,8 +11,8 @@ void Application::Tick()
 
 void Application::Run()
 {
-    _running  = true;
-    _lastTime = std::chrono::steady_clock::now();
+    _running = true;
+    _timer.start();
     OnInit();
 
     while (_running)

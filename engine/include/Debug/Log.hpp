@@ -41,7 +41,7 @@ namespace Debug
         std::string logMessage;
 
         /* Get the Current Time */
-        time_t time = std::time(nullptr);
+        const time_t time = std::time(nullptr);
         tm *localTime = std::localtime(&time);
         const std::string stime = fmt::format("{}:{}:{}", localTime->tm_hour, localTime->tm_min, localTime->tm_sec);
 

@@ -1,105 +1,127 @@
 #include "Timer/Timer.hpp"
-#include <SDL2/SDL.h>
-#include <cstdint>
 
-Timer::Timer()
+#include <iomanip>
+#include <sstream>
+
+Timer::Timer() : mStartTime{}, mLastTickTime{}, mPausedDuration(Clock::duration::zero()), mPaused(false), mStarted(false)
 {
-    //Initialize the variables
-    mStartTicks = 0;
-    mPausedTicks = 0;
-
-    mPaused = false;
-    mStarted = false;
 }
 
 void Timer::start()
 {
-    //Start the timer
     mStarted = true;
-
-    //Unpause the timer
     mPaused = false;
-
-    //Get the current clock time
-    mStartTicks = SDL_GetTicks();
-	mPausedTicks = 0;
+    mStartTime = Clock::now();
+    mLastTickTime = mStartTime;
+    mPausedDuration = Clock::duration::zero();
 }
 
 void Timer::stop()
 {
-    //Stop the timer
     mStarted = false;
-
-    //Unpause the timer
     mPaused = false;
-
-	//Clear tick variables
-	mStartTicks = 0;
-	mPausedTicks = 0;
+    mStartTime = TimePoint{};
+    mLastTickTime = TimePoint{};
+    mPausedDuration = Clock::duration::zero();
 }
 
 void Timer::pause()
 {
-    //If the timer is running and isn't already paused
-    if( mStarted && !mPaused )
+    if (mStarted && !mPaused)
     {
-        //Pause the timer
         mPaused = true;
-
-        //Calculate the paused ticks
-        mPausedTicks = SDL_GetTicks() - mStartTicks;
-		mStartTicks = 0;
+        mPausedDuration = Clock::now() - mStartTime;
     }
 }
 
 void Timer::unpause()
 {
-    //If the timer is running and paused
-    if( mStarted && mPaused )
+    if (mStarted && mPaused)
     {
-        //Unpause the timer
         mPaused = false;
-
-        //Reset the starting ticks
-        mStartTicks = SDL_GetTicks() - mPausedTicks;
-
-        //Reset the paused ticks
-        mPausedTicks = 0;
+        mStartTime = Clock::now() - mPausedDuration;
+        mLastTickTime = mStartTime;
+        mPausedDuration = Clock::duration::zero();
     }
 }
 
-uint32_t Timer::getTicks()
+float Timer::getElapsedSeconds() const
 {
-	//The actual timer time
-	uint32_t time = 0;
-
-    //If the timer is running
-    if( mStarted )
+    if (!mStarted)
     {
-        //If the timer is paused
-        if( mPaused )
-        {
-            //Return the number of ticks when the timer was paused
-            time = mPausedTicks;
-        }
-        else
-        {
-            //Return the current time minus the start time
-            time = SDL_GetTicks() - mStartTicks;
-        }
+        return 0.0f;
     }
 
-    return time;
+    if (mPaused)
+    {
+        return std::chrono::duration<float>(mPausedDuration).count();
+    }
+
+    return std::chrono::duration<float>(Clock::now() - mStartTime).count();
 }
 
-bool Timer::isStarted()
+uint64_t Timer::getElapsedMilliseconds() const
 {
-	//Timer is running and paused or unpaused
+    if (!mStarted)
+    {
+        return 0;
+    }
+
+    if (mPaused)
+    {
+        return std::chrono::duration_cast<std::chrono::milliseconds>(mPausedDuration).count();
+    }
+
+    return std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - mStartTime).count();
+}
+
+uint64_t Timer::getDeltaMilliseconds()
+{
+    if (!mStarted || mPaused)
+    {
+        return 0;
+    }
+
+    const TimePoint now = Clock::now();
+    const uint64_t delta = std::chrono::duration_cast<std::chrono::milliseconds>(now - mLastTickTime).count();
+    mLastTickTime = now;
+    return delta;
+}
+
+bool Timer::hasElapsed(float seconds) const
+{
+    return getElapsedSeconds() >= seconds;
+}
+
+std::string Timer::toString() const
+{
+    const float total = getElapsedSeconds();
+    const int m = static_cast<int>(total) / 60;
+    const float s = total - static_cast<float>(m * 60);
+
+    std::ostringstream oss;
+
+    if (m > 0)
+    {
+        oss << m << "m ";
+    }
+
+    oss << std::fixed << std::setprecision(2) << s << "s";
+    return oss.str();
+}
+
+std::ostream& operator<<(std::ostream& os, const Timer& timer)
+{
+    os << timer.toString();
+    return os;
+}
+
+bool Timer::isStarted() const
+{
     return mStarted;
 }
 
-bool Timer::isPaused()
+bool Timer::isPaused() const
 {
-	//Timer is running and paused
     return mPaused && mStarted;
 }

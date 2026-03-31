@@ -32,8 +32,8 @@ namespace Debug
 
     static AssertLevel assertLevel = AssertLevel::A_WARNING;
 
-    inline bool Assert(bool check, const std::string &message, const char *file, unsigned int line,
-                       AssertLevel assertLvl = AssertLevel::A_WARNING)
+    inline bool Assert(const bool check, const std::string &message, const char *file, unsigned int line,
+                       const AssertLevel assertLvl = AssertLevel::A_WARNING)
     {
 
         if (!check)
@@ -43,7 +43,7 @@ namespace Debug
             return false;
 
         /* Get the Current Time */
-        time_t time = std::time(nullptr);
+        const time_t time = std::time(nullptr);
         tm *localTime = std::localtime(&time);
         const std::string stime = fmt::format("{}:{}:{}", localTime->tm_hour, localTime->tm_min, localTime->tm_sec);
 

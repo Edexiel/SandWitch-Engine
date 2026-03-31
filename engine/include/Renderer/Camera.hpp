@@ -23,5 +23,6 @@ namespace Renderer
         glm::mat4 _projection{1.0f};
         glm::vec3 _position{0.0f};
         glm::vec3 _rotation{0.0f};
+        float near_clip_;
     };
 }

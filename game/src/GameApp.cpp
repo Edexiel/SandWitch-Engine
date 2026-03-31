@@ -2,7 +2,7 @@
 
 void GameApp::OnInit() {}
 
-void GameApp::OnUpdate(float /*deltaTime*/)  {}
+void GameApp::OnUpdate(float deltaTime)  {}
 
 void GameApp::OnRender() {}
 
