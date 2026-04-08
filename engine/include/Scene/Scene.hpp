@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <entt/entt.hpp>
+// #include <entt/entt.hpp>
 
 class Entity;
 
@@ -17,9 +17,9 @@ public:
 
     void OnUpdate(float deltaTime);
 
-    entt::registry& Registry() { return _registry; }
+    // entt::registry& Registry() { return _registry; }
 
 private:
     std::string    _name;
-    entt::registry _registry;
+    // entt::registry _registry;
 };

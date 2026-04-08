@@ -1,10 +1,8 @@
 #ifndef __PLATFORMINPUT_HPP__
 #define __PLATFORMINPUT_HPP__
 
-
 #include <functional>
-
-#include "Maths/Vector2.hpp"
+#include <glm/vec2.hpp>
 
 namespace Input
 {
@@ -35,10 +33,10 @@ namespace Input
     {
         KEY_SPACE = 32,
         KEY_APOSTROPHE = 39, /* ' */
-        KEY_COMMA = 44,      /* , */
-        KEY_MINUS = 45,      /* - */
-        KEY_PERIOD = 46,     /* . */
-        KEY_SLASH = 47,      /* / */
+        KEY_COMMA = 44, /* , */
+        KEY_MINUS = 45, /* - */
+        KEY_PERIOD = 46, /* . */
+        KEY_SLASH = 47, /* / */
         KEY_0 = 48,
         KEY_1 = 49,
         KEY_2 = 50,
@@ -50,7 +48,7 @@ namespace Input
         KEY_8 = 56,
         KEY_9 = 57,
         KEY_SEMICOLON = 59, /* ; */
-        KEY_EQUAL = 61,     /* = */
+        KEY_EQUAL = 61, /* = */
         KEY_A = 65,
         KEY_B = 66,
         KEY_C = 67,
@@ -77,12 +75,12 @@ namespace Input
         KEY_X = 88,
         KEY_Y = 89,
         KEY_Z = 90,
-        KEY_LEFT_BRACKET = 91,  /* [ */
-        KEY_BACKSLASH = 92,     /* \ */
+        KEY_LEFT_BRACKET = 91, /* [ */
+        KEY_BACKSLASH = 92, /* \ */
         KEY_RIGHT_BRACKET = 93, /* ] */
-        KEY_GRAVE_ACCENT = 96,  /* ` */
-        KEY_WORLD_1 = 161,      /* non-US #1 */
-        KEY_WORLD_2 = 162,      /* non-US #2 */
+        KEY_GRAVE_ACCENT = 96, /* ` */
+        KEY_WORLD_1 = 161, /* non-US #1 */
+        KEY_WORLD_2 = 162, /* non-US #2 */
 
         /* Function keys */
         KEY_ESCAPE = 256,
@@ -157,10 +155,11 @@ namespace Input
         KEY_MENU = 348,
         KEY_COUNT
     };
+
     struct MousePosition
     {
-        Maths::Vector2d pos{0, 0};
-        Maths::Vector2d prevPos{0, 0};
+        glm::vec2 pos{0, 0};
+        glm::vec2 prevPos{0, 0};
     };
 
     class PlatformInput
@@ -169,11 +168,11 @@ namespace Input
         virtual ~PlatformInput() = default;
         std::function<void(Action, Key)> keyEvent;
         std::function<void(Action, MouseButton)> MouseButtonEvent;
-        std::function<void(const double x, const double y)> UpdateMousePosition;
+        std::function<void(const float x, const float y)> UpdateMousePosition;
 
         virtual void PollEvents() = 0;
-        virtual void UpdateCursorPosition(MousePosition &mousePosition) = 0;
+        virtual void UpdateCursorPosition(MousePosition& mousePosition) = 0;
     };
-}
+} // namespace Input
 
 #endif

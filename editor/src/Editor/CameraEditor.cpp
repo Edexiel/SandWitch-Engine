@@ -1,48 +1,47 @@
 #include "Editor/CameraEditor.hpp"
 
-#include "Renderer/RendererPlatform.hpp"
-#include "Input/InputManager.hpp"
-#include "Maths/Quaternion.hpp"
-
-#include "Engine.hpp"
 #include <algorithm>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/vec2.hpp>
+
 #include "Engine.hpp"
+#include "Input/InputManager.hpp"
+#include "Renderer/RendererPlatform.hpp"
 
-using namespace Maths;
-
-CameraEditor::CameraEditor(unsigned int width, unsigned int height,
-             float far, float near, float fov)
-             : _width{width}, _height{height}, _far{far}, _near{near}, _fov{fov}, _isPerspective{true},
-             _framebuffer{Renderer::RendererPlatform::CreateFramebuffer(width, height)}{}
+CameraEditor::CameraEditor(unsigned int width, unsigned int height, float far, float near, float fov)
+    : m_width{width}, m_height{height}, m_far{far}, m_near{near}, m_fov{fov}, m_isPerspective{true}, m_framebuffer{Renderer::RendererPlatform::CreateFramebuffer(width, height)}
+{
+}
 
 void CameraEditor::SetRightScale(float scale)
 {
-    _rightScale = scale;
+    m_rightScale = scale;
 }
 
 void CameraEditor::SetLeftScale(float scale)
 {
-    _leftScale = scale;
+    m_leftScale = scale;
 }
 
 void CameraEditor::SetForwardScale(float scale)
 {
-    _forwardScale = scale;
+    m_forwardScale = scale;
 }
 
 void CameraEditor::SetBackwardScale(float scale)
 {
-    _backwardScale = scale;
+    m_backwardScale = scale;
 }
 
 void CameraEditor::SetUpScale(float scale)
 {
-    _upScale = scale;
+    m_upScale = scale;
 }
 
 void CameraEditor::SetDownScale(float scale)
 {
-    _downScale = scale;
+    m_downScale = scale;
 }
 
 void CameraEditor::SetInput()
@@ -58,22 +57,18 @@ void CameraEditor::SetInput()
 
 void CameraEditor::FreeFly()
 {
-    Vector3f forward = _rotation * Vector3f::Forward() * (_forwardScale + _backwardScale);
-    Vector3f right = _rotation * Vector3f::Right() * (_rightScale + _leftScale);
-
-    Vector3f up = Vector3f::Up() * (_upScale + _downScale);
-    Vector3f direction = (forward + right + up).GetNormalized();
-
-    _position = _position + (direction * _speedTranslation) * Engine::Instance().GetTimeManager().GetDeltaTime();
+    glm::vec3 forward = m_rotation * glm::vec3(0.0f, 0.0f, -1.0f) * (m_forwardScale + m_backwardScale);
+    glm::vec3 right = m_rotation * glm::vec3(1.0f, 0.0f, 0.0f) * (m_rightScale + m_leftScale);
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f) * (m_upScale + m_downScale);
+    glm::vec3 combined = forward + right + up;
+    glm::vec3 direction = glm::length(combined) > 0.0f ? glm::normalize(combined) : glm::vec3(0.0f);
+    m_position += direction * m_speedTranslation * Engine::Instance().GetTimeManager().GetDeltaTime();
 }
 
-void CameraEditor::MouseMovement(const Vector2d &currentPos, const Vector2d &oldPos)
+void CameraEditor::MouseMovement(const glm::vec2& currentPos, const glm::vec2& oldPos)
 {
-    Vector2d angleRotation = (currentPos - oldPos) * (_speedRotation * Pi<float>() / 180.f);
-    float deltatime = (float)Engine::Instance().GetDeltaTime();
-    _yaw += (float)angleRotation.x;
-    _pitch = (float)std::clamp(_pitch + angleRotation.y, -Pi<float>() / 2.0, Pi<float>() / 2.0);
-    _rotation = Quaternion({0, 1, 0}, _yaw) * Quaternion({1, 0, 0}, _pitch);
+    glm::vec2 delta = currentPos - oldPos;
+    m_yaw += delta.x * m_speedRotation;
+    m_pitch = std::clamp(m_pitch + delta.y * m_speedRotation, -glm::half_pi<float>(), glm::half_pi<float>());
+    m_rotation = glm::angleAxis(m_yaw, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::angleAxis(m_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
 }
-
-

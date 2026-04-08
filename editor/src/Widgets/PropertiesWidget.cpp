@@ -1,25 +1,22 @@
 #include "Widgets/PropertiesWidget.hpp"
-#include "Engine.hpp"
-
-#include "Scene/Component/EngineComponents.hpp"
-#include "Scene/System/EngineSystems.hpp"
-
-#include "Player/PlayerComponent.hpp"
-#include "Enemy/EnemySpawnPointComponent.hpp"
-#include "TriggerSwitchScene/TriggerSwitchSceneComponent.hpp"
-#include "TriggerSwitchScene/TriggerSwitchSceneSystem.hpp"
-
-#include "Renderer/ModelRenderer.hpp"
-
-#include "misc/cpp/imgui_stdlib.h"
 
 #include <algorithm>
-#include "Editor.hpp"
+#include <glm/gtc/type_ptr.hpp>
 
+#include "Editor.hpp"
+#include "Enemy/EnemySpawnPointComponent.hpp"
+#include "Engine.hpp"
+#include "Player/PlayerComponent.hpp"
+#include "Renderer/ModelRenderer.hpp"
+#include "Scene/Component/EngineComponents.hpp"
+#include "Scene/System/EngineSystems.hpp"
+#include "TriggerSwitchScene/TriggerSwitchSceneComponent.hpp"
+#include "TriggerSwitchScene/TriggerSwitchSceneSystem.hpp"
+#include "misc/cpp/imgui_stdlib.h"
 
 using namespace Component;
 
-PropertiesWidget::PropertiesWidget(Editor &editor) : Widget(editor)
+PropertiesWidget::PropertiesWidget(Editor& editor) : Widget(editor)
 {
     _title = "Properties";
 }
@@ -32,14 +29,12 @@ void PropertiesWidget::UpdateVisible()
         return;
     }
     ShowAssets();
-
 }
 
 void PropertiesWidget::ShowComponents()
 {
-
     //NameReader();
-    World &world = _engine.GetCurrentWorld();
+    World& world = _engine.GetCurrentWorld();
     std::int32_t entity = _editor.selectedEntity;
     if (world.HasComponent<Name>(entity))
         NameReader();
@@ -70,23 +65,20 @@ void PropertiesWidget::ShowComponents()
     if (world.HasComponent<PlayerComponent>(entity))
         ImGui::CollapsingHeader("Player");
 
-
     AddComponent();
     ImGui::SameLine();
     DeleteComponent();
 }
 
-
 void PropertiesWidget::ShowAssets()
 {
-
     ImGui::BeginChild("ViewportRender");
 
     ImGui::Text("%s", _editor.assetName.c_str());
 
     std::string type = Resources::ResourcesManager::GetFileType(_editor.assetName);
 
-    const Resources::Asset *asset = _engine.GetResourcesManager().GetAsset(_editor.assetName);
+    const Resources::Asset* asset = _engine.GetResourcesManager().GetAsset(_editor.assetName);
 
     if (asset)
     {
@@ -101,12 +93,11 @@ void PropertiesWidget::ShowAssets()
     }
 
     ImGui::EndChild();
-
 }
 
-void PropertiesWidget::DisplayMaterial(const Resources::Asset *asset)
+void PropertiesWidget::DisplayMaterial(const Resources::Asset* asset)
 {
-    auto *material = (Renderer::Material *) asset;
+    auto* material = (Renderer::Material*) asset;
 
     if (ImGui::Checkbox("Check Lights", &material->checkLight))
     {
@@ -164,9 +155,7 @@ void PropertiesWidget::DisplayMaterial(const Resources::Asset *asset)
     }
 }
 
-std::string
-PropertiesWidget::SelectInList(const std::vector<std::string> &list, const std::string &currentlySelected,
-                               const std::string &comboName)
+std::string PropertiesWidget::SelectInList(const std::vector<std::string>& list, const std::string& currentlySelected, const std::string& comboName)
 {
     std::string selected = currentlySelected;
 
@@ -176,7 +165,7 @@ PropertiesWidget::SelectInList(const std::vector<std::string> &list, const std::
 
     if (ImGui::BeginCombo(comboName.c_str(), selectedName.c_str()))
     {
-        for (const std::string &n : list)
+        for (const std::string& n : list)
         {
             bool isSelected = (currentlySelected == n);
             if (ImGui::Selectable(n.c_str(), isSelected))
@@ -186,18 +175,14 @@ PropertiesWidget::SelectInList(const std::vector<std::string> &list, const std::
             }
 
             if (isSelected)
-                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                ImGui::SetItemDefaultFocus(); // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
         }
         ImGui::EndCombo();
     }
     return selected;
-
 }
 
-bool
-PropertiesWidget::SelectTexture(Renderer::Texture &texture, const std::vector<std::string> &list,
-                                const std::string &currentTexture,
-                                const std::string &comboName)
+bool PropertiesWidget::SelectTexture(Renderer::Texture& texture, const std::vector<std::string>& list, const std::string& currentTexture, const std::string& comboName)
 {
     std::string selectedTexture = SelectInList(list, currentTexture, comboName);
 
@@ -212,29 +197,27 @@ PropertiesWidget::SelectTexture(Renderer::Texture &texture, const std::vector<st
     return false;
 }
 
-void PropertiesWidget::DisplayTexture(const Resources::Asset *asset)
+void PropertiesWidget::DisplayTexture(const Resources::Asset* asset)
 {
-    auto *texture = (Renderer::Texture *) asset;
+    auto* texture = (Renderer::Texture*) asset;
     //Renderer::Texture texture = _engine.GetResourcesManager().LoadTexture(_editor.assetName.c_str());
     ImVec2 wsize = ImGui::GetWindowSize();
     if (wsize.x < wsize.y)
         ImGui::Image((ImTextureID) (size_t) texture->GetID(), {wsize.x, wsize.x}, ImVec2(0, 1), ImVec2(1, 0));
     else
         ImGui::Image((ImTextureID) (size_t) texture->GetID(), {wsize.y, wsize.y}, ImVec2(0, 1), ImVec2(1, 0));
-
 }
 
-void PropertiesWidget::DisplayModel(const Resources::Asset *asset)
+void PropertiesWidget::DisplayModel(const Resources::Asset* asset)
 {
-    Renderer::ModelRenderer &model = (*(Renderer::ModelRenderer *) asset);
+    Renderer::ModelRenderer& model = (*(Renderer::ModelRenderer*) asset);
 
     std::vector<std::string> listModelType;
     listModelType.emplace_back("CLASSIC");
     listModelType.emplace_back("NORMAL_MAP");
     listModelType.emplace_back("SKELETAL");
 
-    std::string selected = SelectInList(listModelType, listModelType[(int) model.GetVertexType()],
-                                        "Model Vertex Type");
+    std::string selected = SelectInList(listModelType, listModelType[(int) model.GetVertexType()], "Model Vertex Type");
 
     if (selected != listModelType[(int) model.GetVertexType()])
     {
@@ -245,42 +228,44 @@ void PropertiesWidget::DisplayModel(const Resources::Asset *asset)
         else if (selected == "SKELETAL")
             _engine.GetResourcesManager().ReLoadModel(_editor.assetName, Renderer::VertexType::V_SKELETAL);
     }
-
 }
 
-void PropertiesWidget::DisplaySound(const Resources::Asset *asset)
+void PropertiesWidget::DisplaySound(const Resources::Asset* asset)
 {
     _engine.GetResourcesManager().LoadSound(_editor.assetName, Audio::SoundType::S_MASTER);
 }
 
 void PropertiesWidget::NameReader()
 {
-    auto &name = _engine.GetCurrentWorld().GetComponent<Name>(_editor.selectedEntity);
+    auto& name = _engine.GetCurrentWorld().GetComponent<Name>(_editor.selectedEntity);
     ImGui::InputText("Name", &name.name);
 }
 
 void PropertiesWidget::TransformReader()
 {
-
-    ImGuiIO &io = ImGui::GetIO();
-    auto &transform = _engine.GetCurrentWorld().GetComponent<Transform>(_editor.selectedEntity);
+    ImGuiIO& io = ImGui::GetIO();
+    auto& transform = _engine.GetCurrentWorld().GetComponent<Transform>(_editor.selectedEntity);
 
     if (!ImGui::CollapsingHeader("Transform"))
         return;
 
-    ImGui::DragFloat3("Position", transform.position.e);
-    ImGui::DragFloat3("Scale", transform.scale.e);
-    bool isRotationChange = ImGui::DragFloat3("Rotation", _eulerRot.e);
+    ImGui::DragFloat3("Position", glm::value_ptr(transform.position));
+    ImGui::DragFloat3("Scale", glm::value_ptr(transform.scale));
+    bool isRotationChange = ImGui::DragFloat3("Rotation", glm::value_ptr(_eulerRot));
 
     if (!ImGui::IsMouseDragging(0) && !isRotationChange)
-        _eulerRot = transform.rotation.ToEuler() * RadToDeg<float>();
+    {
+        _eulerRot = glm::eulerAngles(transform.rotation) * RadToDeg<float>();
+    }
     if (isRotationChange)
-        transform.rotation = Maths::Quaternion::EulerToQuaternion(_eulerRot * DegToRad<float>());
+    {
+        transform.rotation = glm::quat(_eulerRot * DegToRad<float>());
+    }
 }
 
 void PropertiesWidget::LightReader()
 {
-    auto &light = _engine.GetCurrentWorld().GetComponent<Component::Light>(_editor.selectedEntity);
+    auto& light = _engine.GetCurrentWorld().GetComponent<Component::Light>(_editor.selectedEntity);
 
     if (!ImGui::CollapsingHeader("Light"))
         return;
@@ -294,8 +279,7 @@ void PropertiesWidget::LightReader()
     {
         for (int n = 0; n < listLightType.size(); n++)
         {
-            bool isSelected = (listLightType[(int) light.type] ==
-                               listLightType[n]); // You can store your selection however you want, outside or inside your objects
+            bool isSelected = (listLightType[(int) light.type] == listLightType[n]); // You can store your selection however you want, outside or inside your objects
             if (ImGui::Selectable(listLightType[n].c_str(), isSelected))
             {
                 switch (n)
@@ -309,7 +293,6 @@ void PropertiesWidget::LightReader()
                     case 2:
                         light.type = Component::LightType::L_SPOT;
                         break;
-
                 }
                 _engine.GetCurrentWorld().GetSystem<LightSystem>()->Update();
             }
@@ -319,29 +302,24 @@ void PropertiesWidget::LightReader()
         ImGui::EndCombo();
     }
 
-    if (ImGui::ColorEdit3("Ambient", light.ambient.e) ||
-        ImGui::ColorEdit3("Diffuse", light.diffuse.e) ||
-        ImGui::ColorEdit3("Specular", light.specular.e))
+    if (ImGui::ColorEdit3("Ambient", light.ambient.e) || ImGui::ColorEdit3("Diffuse", light.diffuse.e) || ImGui::ColorEdit3("Specular", light.specular.e))
     {
         _engine.GetCurrentWorld().GetSystem<LightSystem>()->Update();
     }
     if (light.type != Component::LightType::L_DIRECTIONAL)
     {
-        if (ImGui::InputFloat("Linear Attenuation", &light.linear, 0.0f, 0.0f, "%.9f") ||
-            ImGui::InputFloat("Quadratic Attenuation", &light.quadratic, 0.0f, 0.0f, "%.9f"))
+        if (ImGui::InputFloat("Linear Attenuation", &light.linear, 0.0f, 0.0f, "%.9f") || ImGui::InputFloat("Quadratic Attenuation", &light.quadratic, 0.0f, 0.0f, "%.9f"))
         {
             _engine.GetCurrentWorld().GetSystem<LightSystem>()->Update();
         }
     }
     if (light.type == Component::LightType::L_SPOT)
     {
-        if (ImGui::DragFloat("Spot Angle", &light.spotAngle) ||
-            ImGui::DragFloat("Outer Spot Angle", &light.outerSpotAngle))
+        if (ImGui::DragFloat("Spot Angle", &light.spotAngle) || ImGui::DragFloat("Outer Spot Angle", &light.outerSpotAngle))
         {
             _engine.GetCurrentWorld().GetSystem<LightSystem>()->Update();
         }
     }
-
 }
 
 void PropertiesWidget::ModelReader()
@@ -349,25 +327,24 @@ void PropertiesWidget::ModelReader()
     if (!ImGui::CollapsingHeader("Model"))
         return;
 
-
     auto& component = _engine.GetCurrentWorld().GetComponent<Component::Model>(_editor.selectedEntity);
-    Renderer::ModelRenderer &model = component.model;
+    Renderer::ModelRenderer& model = component.model;
 
     std::vector<std::string> listModel = _engine.GetResourcesManager().GetModelNameList();
 
     if (ImGui::BeginCombo("##ModelCombo", model.GetName().c_str()))
     {
-        for (auto &n : listModel)
+        for (auto& n : listModel)
         {
             bool isSelected = (model.GetPath() == n);
             if (ImGui::Selectable(n.c_str(), isSelected))
             {
-                model = _engine.GetResourcesManager().LoadModel(n,Renderer::VertexType::V_CLASSIC);
+                model = _engine.GetResourcesManager().LoadModel(n, Renderer::VertexType::V_CLASSIC);
                 _engine.GetCurrentWorld().GetSystem<RenderSystem>()->SetMaterials();
             }
 
             if (isSelected)
-                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                ImGui::SetItemDefaultFocus(); // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
         }
         ImGui::EndCombo();
     }
@@ -376,8 +353,7 @@ void PropertiesWidget::ModelReader()
 
     for (unsigned int i = 0; i < model.GetNumberMesh(); i++)
     {
-        ImGui::SliderInt((std::string("Material Mesh ") + std::to_string(i + 1)).c_str(),
-                         (int *) model.GetMeshMaterialIndex(i), 0, (int) model.GetNumberMaterial() - 1);
+        ImGui::SliderInt((std::string("Material Mesh ") + std::to_string(i + 1)).c_str(), (int*) model.GetMeshMaterialIndex(i), 0, (int) model.GetNumberMaterial() - 1);
         _engine.GetCurrentWorld().GetSystem<RenderSystem>()->SetMaterials();
     }
 
@@ -385,21 +361,19 @@ void PropertiesWidget::ModelReader()
 
     for (unsigned int i = 0; i < model.GetNumberMaterial(); i++)
     {
-        if (ImGui::BeginCombo((std::string("##comboMaterial") + std::to_string(i)).c_str(),
-                              model.GetMaterial(i)->GetName().c_str()))
+        if (ImGui::BeginCombo((std::string("##comboMaterial") + std::to_string(i)).c_str(), model.GetMaterial(i)->GetName().c_str()))
         {
-            for (auto &n : listMaterial)
+            for (auto& n : listMaterial)
             {
                 bool isSelected = (model.GetPath() == n);
                 if (ImGui::Selectable(n.c_str(), isSelected))
                 {
-                    Renderer::MaterialInterface materialInterface = _engine.GetResourcesManager().LoadMaterial(
-                            n.c_str());
+                    Renderer::MaterialInterface materialInterface = _engine.GetResourcesManager().LoadMaterial(n.c_str());
                     model.ChangeMaterial(materialInterface, i);
                     _engine.GetCurrentWorld().GetSystem<RenderSystem>()->SetMaterials();
                 }
                 if (isSelected)
-                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                    ImGui::SetItemDefaultFocus(); // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
             }
             ImGui::EndCombo();
         }
@@ -416,13 +390,13 @@ void PropertiesWidget::AnimatorReader()
     if (ImGui::CollapsingHeader("Animator"))
         return;
 
-    auto &animator = _engine.GetCurrentWorld().GetComponent<Component::Animator>(_editor.selectedEntity);
+    auto& animator = _engine.GetCurrentWorld().GetComponent<Component::Animator>(_editor.selectedEntity);
 
     std::vector<std::string> listAnimation = _engine.GetResourcesManager().GetAnimationNameList();
 
     if (ImGui::BeginCombo("##AnimatorCombo", animator.GetAnimation().GetName().c_str()))
     {
-        for (auto &n : listAnimation)
+        for (auto& n : listAnimation)
         {
             bool isSelected = (animator.GetAnimation().GetPath() == n);
             if (ImGui::Selectable(n.c_str(), isSelected))
@@ -432,16 +406,15 @@ void PropertiesWidget::AnimatorReader()
             }
 
             if (isSelected)
-                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                ImGui::SetItemDefaultFocus(); // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
         }
         ImGui::EndCombo();
     }
 }
 
-
 void PropertiesWidget::CameraReader()
 {
-    auto &camera = _engine.GetCurrentWorld().GetComponent<Camera>(_editor.selectedEntity);
+    auto& camera = _engine.GetCurrentWorld().GetComponent<Camera>(_editor.selectedEntity);
     if (!ImGui::CollapsingHeader("Camera"))
         return;
 
@@ -461,7 +434,7 @@ void PropertiesWidget::RigidBodyReader()
     if (!ImGui::CollapsingHeader("RigidBody"))
         return;
 
-    auto &rigidBody = _engine.GetCurrentWorld().GetComponent<RigidBody>(_editor.selectedEntity);
+    auto& rigidBody = _engine.GetCurrentWorld().GetComponent<RigidBody>(_editor.selectedEntity);
 
     RigidBodyChangeBodyType(rigidBody);
     RigidBodyResizeShape(rigidBody);
@@ -473,7 +446,7 @@ void PropertiesWidget::RigidBodyReader()
 
 void PropertiesWidget::AddComponent()
 {
-    World &world = _engine.GetCurrentWorld();
+    World& world = _engine.GetCurrentWorld();
     if (ImGui::Button("Add Component"))
     {
         ImGui::OpenPopup("##ComponentContextMenu_Add");
@@ -486,7 +459,7 @@ void PropertiesWidget::AddComponent()
         {
             world.AddComponent(_editor.selectedEntity, Component::Camera(1280, 720, 1000, -1, 20 * 3.1415 / 180));
         }
-            //Light
+        //Light
         if (!world.HasComponent<Light>(_editor.selectedEntity) && ImGui::BeginMenu("Light"))
         {
             AddLight();
@@ -496,13 +469,12 @@ void PropertiesWidget::AddComponent()
         if (!world.HasComponent<Model>(_editor.selectedEntity) && ImGui::BeginMenu("Model"))
         {
             std::vector<std::string> listModel = _engine.GetResourcesManager().GetModelNameList();
-            for (const auto &n : listModel)
+            for (const auto& n : listModel)
             {
                 if (ImGui::MenuItem(n.c_str()))
                 {
                     Component::Model model;
-                    model.model = _engine.GetResourcesManager().LoadModel(n,
-                                                                          Renderer::VertexType::V_NORMALMAP);
+                    model.model = _engine.GetResourcesManager().LoadModel(n, Renderer::VertexType::V_NORMALMAP);
                     world.AddComponent(_editor.selectedEntity, model);
                 }
             }
@@ -515,7 +487,7 @@ void PropertiesWidget::AddComponent()
             world.AddComponent(_editor.selectedEntity, PlayerComponent());
         if (!world.HasComponent<CameraGameplay>(_editor.selectedEntity) && ImGui::MenuItem("Camera Gameplay"))
             world.AddComponent(_editor.selectedEntity, CameraGameplay());
-        if(world.HasComponent<Transform>(_editor.selectedEntity))
+        if (world.HasComponent<Transform>(_editor.selectedEntity))
             AddRigidBody(); // Propose to add a RigidBody only if the entity already have a Transform
         if (!world.HasComponent<Animator>(_editor.selectedEntity) && ImGui::MenuItem("Animator"))
             world.AddComponent(_editor.selectedEntity, Animator());
@@ -530,12 +502,11 @@ void PropertiesWidget::AddComponent()
 
         ImGui::EndPopup();
     }
-
 }
 
 void PropertiesWidget::AddLight()
 {
-    World &world = _engine.GetCurrentWorld();
+    World& world = _engine.GetCurrentWorld();
 
     Component::Light light;
 
@@ -568,7 +539,7 @@ void PropertiesWidget::AddLight()
 
 void PropertiesWidget::DeleteComponent()
 {
-    World &world = _engine.GetCurrentWorld();
+    World& world = _engine.GetCurrentWorld();
     if (ImGui::Button("Delete Component"))
     {
         ImGui::OpenPopup("##ComponentContextMenu_Delete");
@@ -606,7 +577,7 @@ void PropertiesWidget::AddRigidBody()
 {
     if (ImGui::BeginMenu("RigidBody"))
     {
-        World &world = _engine.GetCurrentWorld();
+        World& world = _engine.GetCurrentWorld();
         if (ImGui::MenuItem("Box collider"))
         {
             world.AddComponent(_editor.selectedEntity, RigidBody());
@@ -620,7 +591,6 @@ void PropertiesWidget::AddRigidBody()
             PhysicsSystem::SetRigidBody(_editor.selectedEntity);
             PhysicsSystem::SetType(_editor.selectedEntity, BodyType::STATIC);
             PhysicsSystem::AddSphereCollider(_editor.selectedEntity, 1.f);
-
         }
         if (ImGui::MenuItem("Capsule collider"))
         {
@@ -633,30 +603,27 @@ void PropertiesWidget::AddRigidBody()
     }
 }
 
-void PropertiesWidget::RigidBodyChangeBodyType(Component::RigidBody &rigidBody)
+void PropertiesWidget::RigidBodyChangeBodyType(Component::RigidBody& rigidBody)
 {
-    const char *enumBodyType[]{"Static", "Kinematic", "Dynamic"};
+    const char* enumBodyType[]{"Static", "Kinematic", "Dynamic"};
     int bodyType = (int) rigidBody.GetBodyType();
     if (ImGui::Combo("BodyType", &bodyType, enumBodyType, IM_ARRAYSIZE(enumBodyType)))
     {
         switch (bodyType)
         {
-            case 0:
-            {
+            case 0: {
                 if (rigidBody.GetBodyType() != BodyType::STATIC)
                     PhysicsSystem::SetType(_editor.selectedEntity, BodyType::STATIC);
 
                 break;
             }
-            case 1:
-            {
+            case 1: {
                 if (rigidBody.GetBodyType() != BodyType::KINEMATIC)
                     PhysicsSystem::SetType(_editor.selectedEntity, BodyType::KINEMATIC);
 
                 break;
             }
-            case 2:
-            {
+            case 2: {
                 if (rigidBody.GetBodyType() != BodyType::DYNAMIC)
                     PhysicsSystem::SetType(_editor.selectedEntity, BodyType::DYNAMIC);
 
@@ -668,13 +635,15 @@ void PropertiesWidget::RigidBodyChangeBodyType(Component::RigidBody &rigidBody)
     }
 }
 
-void PropertiesWidget::RigidBodyResizeShape(Component::RigidBody &rigidBody)
+void PropertiesWidget::RigidBodyResizeShape(Component::RigidBody& rigidBody)
 {
     if (rigidBody.GetCollisionShapeType() == CollisionShapeType::CONVEX_POLYHEDRON)
     {
-        Maths::Vector3<float> halfExtend = rigidBody.GetHalfExtends();
-        if (ImGui::DragFloat3("Half extend", halfExtend.e))
+        glm::vec3 halfExtend = rigidBody.GetHalfExtends();
+        if (ImGui::DragFloat3("Half extend", glm::value_ptr(halfExtend)))
+        {
             PhysicsSystem::ResizeBoxCollider(_editor.selectedEntity, halfExtend);
+        }
     }
     if (rigidBody.GetCollisionShapeType() == CollisionShapeType::SPHERE)
     {
@@ -687,23 +656,21 @@ void PropertiesWidget::RigidBodyResizeShape(Component::RigidBody &rigidBody)
         float radius = rigidBody.GetRadius();
         float height = rigidBody.GetHeight();
 
-        if (ImGui::DragFloat("Radius", &radius, 0.1f, 0.001f, FLT_MAX)
-            || ImGui::DragFloat("height", &height, 0.1f, 0.001f, FLT_MAX))
+        if (ImGui::DragFloat("Radius", &radius, 0.1f, 0.001f, FLT_MAX) || ImGui::DragFloat("height", &height, 0.1f, 0.001f, FLT_MAX))
         {
             PhysicsSystem::ResizeCapsuleCollider(_editor.selectedEntity, radius, height);
         }
     }
 }
 
-void PropertiesWidget::RigidBodySetIsTrigger(Component::RigidBody &rigidBody)
+void PropertiesWidget::RigidBodySetIsTrigger(Component::RigidBody& rigidBody)
 {
     bool isTrigger = rigidBody.GetIsTrigger();
     if (ImGui::Checkbox("Trigger", &isTrigger))
         PhysicsSystem::SetIsTrigger(_editor.selectedEntity, isTrigger);
-
 }
 
-void PropertiesWidget::RigidBodySetMass(RigidBody &rigidBody)
+void PropertiesWidget::RigidBodySetMass(RigidBody& rigidBody)
 {
     float mass = rigidBody.GetMass();
     if (ImGui::DragFloat("mass", &mass))
@@ -712,14 +679,14 @@ void PropertiesWidget::RigidBodySetMass(RigidBody &rigidBody)
     }
 }
 
-void PropertiesWidget::RigidBodySetIsGravityEnabled(RigidBody &rigidBody)
+void PropertiesWidget::RigidBodySetIsGravityEnabled(RigidBody& rigidBody)
 {
     bool isGravityEnabled = rigidBody.GetIsGravityEnabled();
     if (ImGui::Checkbox("Gravity Enabled", &isGravityEnabled))
         PhysicsSystem::SetIsGravityEnable(_editor.selectedEntity, isGravityEnabled);
 }
 
-void PropertiesWidget::RigidBodySetBounciness(RigidBody &rigidBody)
+void PropertiesWidget::RigidBodySetBounciness(RigidBody& rigidBody)
 {
     float bounciness = rigidBody.GetBounciness();
     if (ImGui::DragFloat("Bounciness", &bounciness, 0.1f, 0.0f, 1.0f))
@@ -730,7 +697,7 @@ void PropertiesWidget::CharacterControllerReader()
 {
     if (!ImGui::CollapsingHeader("Character controller"))
         return;
-    auto &characterController = _engine.GetCurrentWorld().GetComponent<CharacterController>(_editor.selectedEntity);
+    auto& characterController = _engine.GetCurrentWorld().GetComponent<CharacterController>(_editor.selectedEntity);
     ImGui::DragFloat("Speed", &characterController.speed);
 }
 
@@ -738,7 +705,7 @@ void PropertiesWidget::CameraGameplayReader()
 {
     if (!ImGui::CollapsingHeader("Camera Gameplay"))
         return;
-    auto &cameraController = _engine.GetCurrentWorld().GetComponent<CameraGameplay>(_editor.selectedEntity);
+    auto& cameraController = _engine.GetCurrentWorld().GetComponent<CameraGameplay>(_editor.selectedEntity);
     ImGui::DragFloat3("Distance", cameraController.distance.e);
 }
 
@@ -749,27 +716,27 @@ void PropertiesWidget::ParticleReader()
 
     auto& particleEmitter = _engine.GetCurrentWorld().GetComponent<ParticleEmitter>(_editor.selectedEntity);
 
-    if(ImGui::TreeNode("Color##Particle"))
+    if (ImGui::TreeNode("Color##Particle"))
     {
         ImGui::ColorEdit4("Start", particleEmitter.ColorStart().e);
         ImGui::ColorEdit4("End", particleEmitter.ColorEnd().e);
         ImGui::TreePop();
     }
 
-    if(ImGui::TreeNode("Length##Particle"))
+    if (ImGui::TreeNode("Length##Particle"))
     {
-        ImGui::DragFloat("Start", &particleEmitter.LengthStart(),0.1f,0.f);
-        ImGui::DragFloat("End", &particleEmitter.LengthEnd(),0.1f,0.f);
+        ImGui::DragFloat("Start", &particleEmitter.LengthStart(), 0.1f, 0.f);
+        ImGui::DragFloat("End", &particleEmitter.LengthEnd(), 0.1f, 0.f);
         ImGui::TreePop();
     }
-    if(ImGui::TreeNode("Angle##Particle"))
+    if (ImGui::TreeNode("Angle##Particle"))
     {
         ImGui::SliderAngle("Start", &particleEmitter.AngleStart());
         ImGui::SliderAngle("End", &particleEmitter.AngleEnd());
         ImGui::TreePop();
     }
     float duration = particleEmitter.GetDuration();
-    if (ImGui::DragFloat("Duration", &duration, 0.1f,0.f,60.f))
+    if (ImGui::DragFloat("Duration", &duration, 0.1f, 0.f, 60.f))
         particleEmitter.SetDuration(duration);
 
     int size = particleEmitter.GetSize();
@@ -782,7 +749,7 @@ void PropertiesWidget::ParticleReader()
 
     if (ImGui::BeginCombo("Texture", texture.GetName().c_str()))
     {
-        for (auto &n : listTexture)
+        for (auto& n : listTexture)
         {
             bool isSelected = (texture.GetPath() == n);
             if (ImGui::Selectable(n.c_str(), isSelected))
@@ -794,7 +761,7 @@ void PropertiesWidget::ParticleReader()
             }
 
             if (isSelected)
-                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                ImGui::SetItemDefaultFocus(); // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
         }
         ImGui::EndCombo();
     }
@@ -811,16 +778,16 @@ void PropertiesWidget::SimpleShadowReader()
 
     if (ImGui::BeginCombo("Shadow Type", listShadowType[shadow.type]))
     {
-        for (unsigned int i = 0; i < 2 ; i++)
+        for (unsigned int i = 0; i < 2; i++)
         {
             bool isSelected = (listShadowType[shadow.type] == listShadowType[i]);
             if (ImGui::Selectable(listShadowType[i], isSelected))
             {
-                shadow.type = (SimpleShadow::ShadowType)i;
+                shadow.type = (SimpleShadow::ShadowType) i;
             }
 
             if (isSelected)
-                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                ImGui::SetItemDefaultFocus(); // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
         }
         ImGui::EndCombo();
     }
@@ -836,7 +803,7 @@ void PropertiesWidget::SwitchSceneTriggerReader()
 {
     if (!ImGui::CollapsingHeader("Switch scene trigger"))
         return;
-    auto &triggerSwitchSceneComponent = _engine.GetCurrentWorld().GetComponent<TriggerSwitchSceneComponent>(_editor.selectedEntity);
+    auto& triggerSwitchSceneComponent = _engine.GetCurrentWorld().GetComponent<TriggerSwitchSceneComponent>(_editor.selectedEntity);
     static int test = 0;
 
     if (ImGui::BeginCombo("##WorldCombo", triggerSwitchSceneComponent.world.c_str()))
@@ -850,7 +817,7 @@ void PropertiesWidget::SwitchSceneTriggerReader()
             }
 
             if (isSelected)
-                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                ImGui::SetItemDefaultFocus(); // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
         }
         ImGui::EndCombo();
     }
@@ -865,5 +832,5 @@ void PropertiesWidget::EnemySpawnReader()
     ImGui::DragFloat("Spawn Interval", &spawner.spawnInterval, 0.1f);
     ImGui::DragFloat("Inner Radius", &spawner.innerRadius, 0.1f);
     ImGui::DragFloat("Outer Radius", &spawner.outerRadius, 0.1f);
-    ImGui::DragInt("Nb Enemies", (int*)(&spawner.nbEnemy), 1, 0, 100);
+    ImGui::DragInt("Nb Enemies", (int*) (&spawner.nbEnemy), 1, 0, 100);
 }

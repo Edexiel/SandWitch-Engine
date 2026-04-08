@@ -1,9 +1,10 @@
 #ifndef QUACKENGINE_SCENEWIDGET_HPP
 #define QUACKENGINE_SCENEWIDGET_HPP
 
-#include "Widgets/Widget.hpp"
+#include <glm/mat4x4.hpp>
+
 #include "ImGuizmo.h"
-#include "Maths/Matrix4.hpp"
+#include "Widgets/Widget.hpp"
 
 class SceneWidget : public Widget
 {
@@ -15,18 +16,16 @@ private:
 
     void CameraUpdate();
     void MouseMovement();
-    void ImGuizmoUpdate(const Maths::Matrix4& view, const Maths::Matrix4& projection);
+    void ImGuizmoUpdate(const glm::mat4& view, const glm::mat4& projection);
     void SelectOperation();
-    void ManipulateEntity(const Maths::Matrix4& view, const Maths::Matrix4& projection);
+    void ManipulateEntity(const glm::mat4& view, const glm::mat4& projection);
 
-    Maths::Matrix4 _mat;
+    glm::mat4 _mat;
 
 public:
-    SceneWidget(Editor &editor);
+    SceneWidget(Editor& editor);
 
     void UpdateVisible() final;
-
 };
-
 
 #endif //QUACKENGINE_SCENEWIDGET_HPP

@@ -1,10 +1,17 @@
 #pragma once
 
-#include <string_view>
+#include <string>
+
+enum class WINDOW_MODE
+{
+    WINDOWED,
+    FULLSCREEN,
+    WINDOWED_FULLSCREEN,
+};
 
 struct EngineSettings
 {
-    std::string_view windowTitle{};
+    std::string windowTitle{};
     int windowSize[2];
     WINDOW_MODE mode{};
     int monitor = 0;

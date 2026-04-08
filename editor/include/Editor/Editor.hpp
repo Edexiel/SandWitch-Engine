@@ -1,19 +1,20 @@
 #ifndef QUACKENGINE_EDITOR_HPP
 #define QUACKENGINE_EDITOR_HPP
 
-#include "../../Widgets/include/CameraEditor.hpp"
-
+#include <cstdint>
 #include <vector>
 #include <memory>
 #include <string>
 
+#include "CameraEditor.hpp"
+
 class Editor
 {
 private:
-    std::vector<std::unique_ptr<class Widget>> _widgets;
-    std::unique_ptr<class Widget> _menuBar;
+    std::vector<std::unique_ptr<class Widget>> m_widgets;
+    std::unique_ptr<class Widget> m_menuBar;
 
-    class Engine &_engine;
+    class Engine &m_engine;
 
     void InitWidgets();
     static void InitImGui(struct GLFWwindow *window);
@@ -21,7 +22,6 @@ private:
     static void SetIo();
 
 public:
-    /*** Selection ***/
     std::int32_t selectedEntity = 0;
     bool showProperties{true};
     std::string assetName;
@@ -35,7 +35,7 @@ public:
 
 inline Engine &Editor::GetEngine() const
 {
-    return _engine;
+    return m_engine;
 }
 
 #endif //QUACKENGINE_EDITOR_HPP
